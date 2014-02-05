@@ -27,8 +27,8 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 	 * Constructur, load all required stuff.
 	 */
 	function __construct() {
-		$this->longname  = __( 'Google Analytics Configuration', 'google-analytics-for-wordpress' );
-		$this->shortname = __( 'Google Analytics', 'google-analytics-for-wordpress' );
+		$this->longname  = __( 'Google Analytics Configuration', 'gawp' );
+		$this->shortname = __( 'Google Analytics', 'gawp' );
 
 		$this->upgrade();
 
@@ -117,23 +117,10 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
                         jQuery('#extrasebox').css("display", "none");
                     }
                 }).change();
-                jQuery('#gajslocalhosting').change(function () {
-                    if (jQuery('#gajslocalhosting').is(':checked')) {
-                        jQuery('#localhostingbox').css("display", "block");
-                    } else {
-                        jQuery('#localhostingbox').css("display", "none");
-                    }
-                }).change();
-                jQuery('#customvarsettings :input').change(function () {
-                    if (jQuery("#customvarsettings :input:checked").size() > 5) {
-                        alert("<?php _e( 'The maximum number of allowed custom variables in Google Analytics is 5, please unselect one of the other custom variables before selecting this one.', 'google-analytics-for-wordpress' ); ?>");
-                        jQuery(this).attr('checked', false);
-                    }
-                });
                 jQuery('#uastring').change(function () {
                     if (jQuery('#switchtomanual').is(':checked')) {
                         if (!jQuery(this).val().match(/^UA-[\d-]+$/)) {
-                            alert("<?php _e( 'That\'s not a valid UA ID, please make sure it matches the expected pattern of: UA-XXXXXX-X, and that there are no spaces or other characters in the input field.', 'google-analytics-for-wordpress' ); ?>");
+                            alert("<?php _e( 'That\'s not a valid UA ID, please make sure it matches the expected pattern of: UA-XXXXXX-X, and that there are no spaces or other characters in the input field.', 'gawp' ); ?>");
                             jQuery(this).focus();
                         }
                     }
@@ -148,8 +135,8 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 	function plugin_help( $contextual_help, $screen_id, $screen ) {
 		if ( $screen_id == 'settings_page_' . $this->hook ) {
 
-			$contextual_help = '<h2>' . __( 'Having problems?', 'google-analytics-for-wordpress' ) . '</h2>' .
-				'<p>' . sprintf( __( "If you're having problems with this plugin, please refer to its <a href='%s'>FAQ page</a>.", 'google-analytics-for-wordpress' ), 'http://yoast.com/wordpress/google-analytics/ga-wp-faq/' ) . '</p>';
+			$contextual_help = '<h2>' . __( 'Having problems?', 'gawp' ) . '</h2>' .
+				'<p>' . sprintf( __( "If you're having problems with this plugin, please refer to its <a href='%s'>FAQ page</a>.", 'gawp' ), 'http://yoast.com/wordpress/google-analytics/ga-wp-faq/' ) . '</p>';
 		}
 		return $contextual_help;
 	}
@@ -159,20 +146,20 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 
 		if ( isset( $_REQUEST['reset'] ) && $_REQUEST['reset'] == "true" && isset( $_REQUEST['plugin'] ) && $_REQUEST['plugin'] == 'google-analytics-for-wordpress' ) {
 			$options        = $this->set_defaults();
-			$options['msg'] = "<div class=\"updated\"><p>" . __( 'Google Analytics settings reset.', 'google-analytics-for-wordpress' ) . "</p></div>\n";
+			$options['msg'] = "<div class=\"updated\"><p>" . __( 'Google Analytics settings reset.', 'gawp' ) . "</p></div>\n";
 		} elseif ( isset( $_POST['submit'] ) && isset( $_POST['plugin'] ) && $_POST['plugin'] == 'google-analytics-for-wordpress' ) {
 
-			if ( !current_user_can( 'manage_options' ) ) wp_die( __( 'You cannot edit the Google Analytics for WordPress options.', 'google-analytics-for-wordpress' ) );
+			if ( !current_user_can( 'manage_options' ) ) wp_die( __( 'You cannot edit the Google Analytics for WordPress options.', 'gawp' ) );
 			check_admin_referer( 'analyticspp-config' );
 
-			foreach ( array( 'uastring', 'dlextensions', 'domainorurl', 'position', 'domain', 'customcode', 'ga_token', 'extraseurl', 'gajsurl', 'gfsubmiteventpv', 'trackprefix', 'ignore_userlevel', 'internallink', 'internallinklabel', 'primarycrossdomain', 'othercrossdomains' ) as $option_name ) {
+			foreach ( array( 'uastring', 'dlextensions', 'domainorurl', 'position', 'domain', 'ga_token', 'extraseurl', 'gfsubmiteventpv', 'trackprefix', 'ignore_userlevel', 'internallink', 'internallinklabel' ) as $option_name ) {
 				if ( isset( $_POST[$option_name] ) )
 					$options[$option_name] = $_POST[$option_name];
 				else
 					$options[$option_name] = '';
 			}
 
-			foreach ( array( 'extrase', 'trackoutbound', 'admintracking', 'trackadsense', 'allowanchor', 'allowlinker', 'allowhash', 'rsslinktagging', 'advancedsettings', 'trackregistration', 'theme_updated', 'cv_loggedin', 'cv_authorname', 'cv_category', 'cv_all_categories', 'cv_tags', 'cv_year', 'cv_post_type', 'outboundpageview', 'downloadspageview', 'trackcrossdomain', 'gajslocalhosting', 'manual_uastring', 'taggfsubmit', 'wpec_tracking', 'shopp_tracking', 'anonymizeip', 'trackcommentform', 'debug', 'firebuglite', 'yoast_tracking' ) as $option_name ) {
+			foreach ( array( 'extrase', 'trackoutbound', 'admintracking', 'trackadsense', 'allowanchor', 'allowlinker', 'rsslinktagging', 'advancedsettings', 'trackregistration', 'theme_updated', 'manual_uastring', 'taggfsubmit', 'anonymizeip', 'trackcommentform', 'debug', 'firebuglite', 'yoast_tracking' ) as $option_name ) {
 				if ( isset( $_POST[$option_name] ) && $_POST[$option_name] == 'on' )
 					$options[$option_name] = true;
 				else
@@ -181,16 +168,6 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 
 			if ( isset( $_POST['manual_uastring'] ) && isset( $_POST['uastring_man'] ) ) {
 				$options['uastring'] = $_POST['uastring_man'];
-			}
-
-			if ( $options['trackcrossdomain'] ) {
-				if ( !$options['allowlinker'] )
-					$options['allowlinker'] = true;
-
-				if ( empty( $options['primarycrossdomain'] ) ) {
-					$origin                        = yoast_ga_get_domain( $_SERVER["HTTP_HOST"] );
-					$options['primarycrossdomain'] = $origin["domain"];
-				}
 			}
 
 			if ( function_exists( 'w3tc_pgcache_flush' ) )
@@ -215,7 +192,7 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 	}
 
 	function save_button() {
-		return '<div class="alignright"><input type="submit" class="button-primary" name="submit" value="' . __( 'Update Google Analytics Settings &raquo;', 'google-analytics-for-wordpress' ) . '" /></div><br class="clear"/>';
+		return '<div class="alignright"><input type="submit" class="button-primary" name="submit" value="' . __( 'Update Google Analytics Settings &raquo;', 'gawp' ) . '" /></div><br class="clear"/>';
 	}
 
 	function upgrade() {
@@ -251,7 +228,7 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
              class="icon32"><br/></div>
     </a>
 
-    <h2><?php _e( "Google Analytics for WordPress Configuration", 'google-analytics-for-wordpress' ) ?></h2>
+    <h2><?php _e( "Google Analytics for WordPress Configuration", 'gawp' ) ?></h2>
 
     <div class="postbox-container" style="width:60%;">
     <div class="metabox-holder">
@@ -263,7 +240,7 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 
 		if ( empty( $options['uastring'] ) && empty( $options['ga_token'] ) ) {
 			$query = $this->plugin_options_url() . '&reauth=true';
-			$line  = __( 'Please authenticate with Google Analytics to retrieve your tracking code:', 'google-analytics-for-wordpress' ) . '<br/><br/> <a class="button-primary" href="' . $query . '">' . __( 'Click here to authenticate with Google', 'google-analytics-for-wordpress' ) . '</a>';
+			$line  = __( 'Please authenticate with Google Analytics to retrieve your tracking code:', 'gawp' ) . '<br/><br/> <a class="button-primary" href="' . $query . '">' . __( 'Click here to authenticate with Google', 'gawp' ) . '</a>';
 		} else if ( isset( $options['ga_token'] ) && !empty( $options['ga_token'] ) ) {
 			$token = $options['ga_token'];
 
@@ -349,7 +326,7 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 					}
 					asort( $ga_accounts );
 
-					$select = '<select class="chzn-select" name="uastring" data-placeholder="' . __( 'Please select the correct Analytics Account', 'google-analytics-for-wordpress' ) . '"  id="ga_account">';
+					$select = '<select class="chzn-select" name="uastring" data-placeholder="' . __( 'Please select the correct Analytics Account', 'gawp' ) . '"  id="ga_account">';
 					$select .= "\t<option></option>\n";
 					foreach ( $ga_accounts as $ua => $title ) {
 						$sel = selected( $ua, $currentua, false );
@@ -358,9 +335,9 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 					$select .= '</select>';
 
 					$line = '<input type="hidden" name="ga_token" value="' . $token . '"/>';
-					$line .= __( 'Please select the correct Analytics account to track:', 'google-analytics-for-wordpress' ) . '<br/>';
+					$line .= __( 'Please select the correct Analytics account to track:', 'gawp' ) . '<br/>';
 					$line .= '<table class="form_table">';
-					$line .= '<tr><th>' . __( 'Profile', 'google-analytics-for-wordpress' ) . ':</th><td>' . $select . '</td></tr>';
+					$line .= '<tr><th>' . __( 'Profile', 'gawp' ) . ':</th><td>' . $select . '</td></tr>';
 					$line .= '</table>';
 
 					$try = 1;
@@ -372,321 +349,201 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 													window.location="' . $this->plugin_options_url() . '&switchua=1&token=' . $token . '&try=' . $try . '";
 												</script>';
 					}
-					$line .= __( 'Please note that if you have several profiles of the same website, it doesn\'t matter which profile you select, and in fact another profile might show as selected later. You can check whether they\'re profiles for the same site by checking if they have the same UA code. If that\'s true, tracking will be correct.', 'google-analytics-for-wordpress' );
+					$line .= __( 'Please note that if you have several profiles of the same website, it doesn\'t matter which profile you select, and in fact another profile might show as selected later. You can check whether they\'re profiles for the same site by checking if they have the same UA code. If that\'s true, tracking will be correct.', 'gawp' );
 					$line .= '<br/><br/>';
-					$line .= __( 'Refresh this listing or switch to another account: ', 'google-analytics-for-wordpress' );
+					$line .= __( 'Refresh this listing or switch to another account: ', 'gawp' );
 				} else {
-					$line = __( 'Unfortunately, an error occurred while connecting to Google, please try again:', 'google-analytics-for-wordpress' );
+					$line = __( 'Unfortunately, an error occurred while connecting to Google, please try again:', 'gawp' );
 				}
 			} else {
-				$line = __( 'Unfortunately, an error occurred while connecting to Google, please try again:', 'google-analytics-for-wordpress' );
+				$line = __( 'Unfortunately, an error occurred while connecting to Google, please try again:', 'gawp' );
 			}
 
 			$query = $this->plugin_options_url() . '&reauth=true';
-			$line .= '<a class="button" href="' . $query . '">' . __( 'Re-authenticate with Google', 'google-analytics-for-wordpress' ) . '</a>';
+			$line .= '<a class="button" href="' . $query . '">' . __( 'Re-authenticate with Google', 'gawp' ) . '</a>';
 		} else {
-			$line = '<input id="uastring" name="uastring" type="text" size="20" maxlength="40" value="' . $options['uastring'] . '"/><br/><a href="' . $this->plugin_options_url() . '&amp;switchua=1">' . __( 'Select another Analytics Profile &raquo;', 'google-analytics-for-wordpress' ) . '</a>';
+			$line = '<input id="uastring" name="uastring" type="text" size="20" maxlength="40" value="' . $options['uastring'] . '"/><br/><a href="' . $this->plugin_options_url() . '&amp;switchua=1">' . __( 'Select another Analytics Profile &raquo;', 'gawp' ) . '</a>';
 		}
-		$line         = '<div id="uastring_automatic">' . $line . '</div><div style="display:none;" id="uastring_manual">' . __( 'Manually enter your UA code: ', 'google-analytics-for-wordpress' ) . '<input id="uastring" name="uastring_man" type="text" size="20" maxlength="40" value="' . $options['uastring'] . '"/></div>';
+		$line         = '<div id="uastring_automatic">' . $line . '</div><div style="display:none;" id="uastring_manual">' . __( 'Manually enter your UA code: ', 'gawp' ) . '<input id="uastring" name="uastring_man" type="text" size="20" maxlength="40" value="' . $options['uastring'] . '"/></div>';
 		$rows         = array();
 		$content      = '';
 		$rows[]       = array(
 			'id'      => 'uastring',
-			'label'   => __( 'Analytics Profile', 'google-analytics-for-wordpress' ),
-			'desc'    => '<input type="checkbox" name="manual_uastring" ' . checked( $options['manual_uastring'], true, false ) . ' id="switchtomanual"/> <label for="switchtomanual">' . __( 'Manually enter your UA code', 'google-analytics-for-wordpress' ) . '</label>',
+			'label'   => __( 'Analytics Profile', 'gawp' ),
+			'desc'    => '<input type="checkbox" name="manual_uastring" ' . checked( $options['manual_uastring'], true, false ) . ' id="switchtomanual"/> <label for="switchtomanual">' . __( 'Manually enter your UA code', 'gawp' ) . '</label>',
 			'content' => $line
 		);
-		$temp_content = $this->select( 'position', array( 'header' => __( 'In the header (default)', 'google-analytics-for-wordpress' ), 'manual' => __( 'Insert manually', 'google-analytics-for-wordpress' ) ) );
+		$temp_content = $this->select( 'position', array( 'header' => __( 'In the header (default)', 'gawp' ), 'manual' => __( 'Insert manually', 'gawp' ) ) );
 		if ( $options['theme_updated'] && $options['position'] == 'manual' ) {
 			$temp_content .= '<input type="hidden" name="theme_updated" value="off"/>';
-			echo '<div id="message" class="updated" style="background-color:lightgreen;border-color:green;"><p><strong>' . __( 'Notice', 'google-analytics-for-wordpress' ), ':</strong> ' . __( 'You switched your theme, please make sure your Google Analytics tracking is still ok. Save your settings to make sure Google Analytics gets loaded properly.', 'google-analytics-for-wordpress' ) . '</p></div>';
+			echo '<div id="message" class="updated" style="background-color:lightgreen;border-color:green;"><p><strong>' . __( 'Notice', 'gawp' ), ':</strong> ' . __( 'You switched your theme, please make sure your Google Analytics tracking is still ok. Save your settings to make sure Google Analytics gets loaded properly.', 'gawp' ) . '</p></div>';
 			remove_action( 'admin_footer', array( &$this, 'theme_switch_warning' ) );
 		}
 		$desc = '<div id="position_header">' . sprintf( __( 'The header is by far the best spot to place the tracking code. If you\'d rather place the code manually, switch to manual placement. For more info %sread this page%s.' ), '<a href="http://yoast.com/wordpress/google-analytics/manual-placement/">', '</a>' ) . '</div>';
-		$desc .= '<div id="position_manual">' . sprintf( __( '%sFollow the instructions here%s to choose the location for your tracking code manually.', 'google-analytics-for-wordpress' ), '<a href="http://yoast.com/wordpress/google-analytics/manual-placement/">', '</a>' ) . '</div>';
+		$desc .= '<div id="position_manual">' . sprintf( __( '%sFollow the instructions here%s to choose the location for your tracking code manually.', 'gawp' ), '<a href="http://yoast.com/wordpress/google-analytics/manual-placement/">', '</a>' ) . '</div>';
 
 		$rows[] = array(
 			'id'      => 'position',
-			'label'   => __( 'Where should the tracking code be placed', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Where should the tracking code be placed', 'gawp' ),
 			'desc'    => $desc,
 			'content' => $temp_content,
 		);
 		$rows[] = array(
 			'id'      => 'trackoutbound',
-			'label'   => __( 'Track outbound clicks &amp; downloads', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Clicks &amp; downloads will be tracked as events, you can find these under Content &raquo; Event Tracking in your Google Analytics reports.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Track outbound clicks &amp; downloads', 'gawp' ),
+			'desc'    => __( 'Clicks &amp; downloads will be tracked as events, you can find these under Content &raquo; Event Tracking in your Google Analytics reports.', 'gawp' ),
 			'content' => $this->checkbox( 'trackoutbound' ),
 		);
 		$rows[] = array(
 			'id'      => 'advancedsettings',
-			'label'   => __( 'Show advanced settings', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Only adviced for advanced users who know their way around Google Analytics', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Show advanced settings', 'gawp' ),
+			'desc'    => __( 'Only adviced for advanced users who know their way around Google Analytics', 'gawp' ),
 			'content' => $this->checkbox( 'advancedsettings' ),
 		);
 		$rows[] = array(
 			'id'      => 'yoast_tracking',
-			'label'   => __( 'Allow tracking of anonymous data', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'By allowing us to track anonymous data we can better help you, because we know with which WordPress configurations, themes and plugins we should test. No personal data will be submitted.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Allow tracking of anonymous data', 'gawp' ),
+			'desc'    => __( 'By allowing us to track anonymous data we can better help you, because we know with which WordPress configurations, themes and plugins we should test. No personal data will be submitted.', 'gawp' ),
 			'content' => $this->checkbox( 'yoast_tracking' ),
 		);
-		$this->postbox( 'gasettings', __( 'Google Analytics Settings', 'google-analytics-for-wordpress' ), $this->form_table( $rows ) . $this->save_button() );
-
-		$rows        = array();
-		$pre_content = '<p>' . __( 'Google Analytics allows you to save up to 5 custom variables on each page, and this plugin helps you make the most use of these! Check which custom variables you\'d like the plugin to save for you below. Please note that these will only be saved when they are actually available.', 'google-analytics-for-wordpress' ) . '</p>';
-		$pre_content .= '<p>' . __( 'If you want to start using these custom variables, go to Visitors &raquo; Custom Variables in your Analytics reports.', 'google-analytics-for-wordpress' ) . '</p>';
-		$rows[] = array(
-			'id'      => 'cv_loggedin',
-			'label'   => __( 'Logged in Users', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to easily remove logged in users from your reports, or to segment by different user roles. The users primary role will be logged.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_loggedin' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_post_type',
-			'label'   => __( 'Post type', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per post type, especially useful if you use multiple custom post types.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_post_type' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_authorname',
-			'label'   => __( 'Author Name', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per author.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_authorname' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_tags',
-			'label'   => __( 'Tags', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per tags using advanced segments.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_tags' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_year',
-			'label'   => __( 'Publication year', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per year of publication, showing you if your old posts still get traffic.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_year' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_category',
-			'label'   => __( 'Single Category', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per category, works best when each post is in only one category.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_category' ),
-		);
-		$rows[] = array(
-			'id'      => 'cv_all_categories',
-			'label'   => __( 'All Categories', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Allows you to see pageviews per category using advanced segments, should be used when you use multiple categories per post.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'cv_all_categories' ),
-		);
-
-		$modules['Custom Variables'] = 'customvarsettings';
-		$this->postbox( 'customvarsettings', __( 'Custom Variables Settings', 'google-analytics-for-wordpress' ), $pre_content . $this->form_table( $rows ) . $this->save_button() );
+		$this->postbox( 'gasettings', __( 'Google Analytics Settings', 'gawp' ), $this->form_table( $rows ) . $this->save_button() );
 
 		$rows   = array();
 		$rows[] = array(
 			'id'      => 'ignore_userlevel',
-			'label'   => __( 'Ignore users', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Users of the role you select and higher will be ignored, so if you select Editor, all Editors and Administrators will be ignored.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Ignore users', 'gawp' ),
+			'desc'    => __( 'Users of the role you select and higher will be ignored, so if you select Editor, all Editors and Administrators will be ignored.', 'gawp' ),
 			'content' => $this->select( 'ignore_userlevel', array(
-				'11' => __( 'Ignore no-one', 'google-analytics-for-wordpress' ),
-				'8'  => __( 'Administrator', 'google-analytics-for-wordpress' ),
-				'5'  => __( 'Editor', 'google-analytics-for-wordpress' ),
-				'2'  => __( 'Author', 'google-analytics-for-wordpress' ),
-				'1'  => __( 'Contributor', 'google-analytics-for-wordpress' ),
-				'0'  => __( 'Subscriber (ignores all logged in users)', 'google-analytics-for-wordpress' ),
+				'11' => __( 'Ignore no-one', 'gawp' ),
+				'8'  => __( 'Administrator', 'gawp' ),
+				'5'  => __( 'Editor', 'gawp' ),
+				'2'  => __( 'Author', 'gawp' ),
+				'1'  => __( 'Contributor', 'gawp' ),
+				'0'  => __( 'Subscriber (ignores all logged in users)', 'gawp' ),
 			) ),
 		);
 		$rows[] = array(
 			'id'      => 'outboundpageview',
-			'label'   => __( 'Track outbound clicks as pageviews', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'You do not need to enable this to enable outbound click tracking, this changes the default behavior of tracking clicks as events to tracking them as pageviews. This is therefore not recommended, as this would skew your statistics, but <em>is</em> sometimes necessary when you need to set outbound clicks as goals.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Track outbound clicks as pageviews', 'gawp' ),
+			'desc'    => __( 'You do not need to enable this to enable outbound click tracking, this changes the default behavior of tracking clicks as events to tracking them as pageviews. This is therefore not recommended, as this would skew your statistics, but <em>is</em> sometimes necessary when you need to set outbound clicks as goals.', 'gawp' ),
 			'content' => $this->checkbox( 'outboundpageview' ),
 		);
 		$rows[] = array(
 			'id'      => 'downloadspageview',
-			'label'   => __( 'Track downloads as pageviews', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Not recommended, as this would skew your statistics, but it does make it possible to track downloads as goals.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Track downloads as pageviews', 'gawp' ),
+			'desc'    => __( 'Not recommended, as this would skew your statistics, but it does make it possible to track downloads as goals.', 'gawp' ),
 			'content' => $this->checkbox( 'downloadspageview' ),
 		);
 		$rows[] = array(
 			'id'      => 'dlextensions',
-			'label'   => __( 'Extensions of files to track as downloads', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Extensions of files to track as downloads', 'gawp' ),
 			'content' => $this->textinput( 'dlextensions' ),
 		);
 		if ( $options['outboundpageview'] ) {
 			$rows[] = array(
 				'id'      => 'trackprefix',
-				'label'   => __( 'Prefix to use in Analytics before the tracked pageviews', 'google-analytics-for-wordpress' ),
-				'desc'    => __( 'This prefix is used before all pageviews, they are then segmented automatically after that. If nothing is entered here, <code>/yoast-ga/</code> is used.', 'google-analytics-for-wordpress' ),
+				'label'   => __( 'Prefix to use in Analytics before the tracked pageviews', 'gawp' ),
+				'desc'    => __( 'This prefix is used before all pageviews, they are then segmented automatically after that. If nothing is entered here, <code>/yoast-ga/</code> is used.', 'gawp' ),
 				'content' => $this->textinput( 'trackprefix' ),
 			);
 		}
 		$rows[]                       = array(
 			'id'      => 'domainorurl',
-			'label'   => __( 'Track full URL of outbound clicks or just the domain', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Track full URL of outbound clicks or just the domain', 'gawp' ),
 			'content' => $this->select( 'domainorurl', array(
-					'domain' => __( 'Just the domain', 'google-analytics-for-wordpress' ),
-					'url'    => __( 'Track the complete URL', 'google-analytics-for-wordpress' ),
+					'domain' => __( 'Just the domain', 'gawp' ),
+					'url'    => __( 'Track the complete URL', 'gawp' ),
 				)
 			),
 		);
 		$rows[]                       = array(
 			'id'      => 'domain',
-			'label'   => __( 'Subdomain Tracking', 'google-analytics-for-wordpress' ),
-			'desc'    => sprintf( __( 'This allows you to set the domain that\'s set by %s<code>setDomainName</code>%s for tracking subdomains, if empty this will not be set.', 'google-analytics-for-wordpress' ), '<a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setDomainName">', '</a>' ),
+			'label'   => __( 'Subdomain Tracking', 'gawp' ),
+			'desc'    => sprintf( __( 'This allows you to set the domain that\'s set by %s<code>setDomainName</code>%s for tracking subdomains, if empty this will not be set.', 'gawp' ), '<a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setDomainName">', '</a>' ),
 			'content' => $this->textinput( 'domain' ),
 		);
 		$rows[]                       = array(
-			'id'      => 'trackcrossdomain',
-			'label'   => __( 'Enable Cross Domain Tracking', 'google-analytics-for-wordpress' ),
-			'desc'    => sprintf( __( 'This allows you to enable %sCross-Domain Tracking%s for this site.  When endabled <code>_setAllowLinker:</code> will be enabled if it is not already.', 'google-analytics-for-wordpress' ), '<a href="http://code.google.com/apis/analytics/docs/tracking/gaTrackingSite.html">', '</a>' ),
-			'content' => $this->checkbox( 'trackcrossdomain' ),
-		);
-		$rows[]                       = array(
-			'id'      => 'primarycrossdomain',
-			'label'   => __( 'Cross-Domain Tracking, Primary Domain', 'google-analytics-for-wordpress' ),
-			'desc'    => sprintf( __( 'Set the primary domain used in %s<code>setDomainName</code>%s for cross domain tracking (eg. <code>example-petstore.com</code> ), if empty this will default to your configured Home URL.', 'google-analytics-for-wordpress' ), '<a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setDomainName">', '</a>' ),
-			'content' => $this->textinput( 'primarycrossdomain' ),
-		);
-		$rows[]                       = array(
-			'id'      => 'othercrossdomains',
-			'label'   => __( 'Cross-Domain Tracking, Other Domains', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'All links to these domains will have the <a href="http://code.google.com/apis/analytics/docs/tracking/gaTrackingSite.html#multipleDomains"><code>_link</code></a> code automatically attached.  Separate domains/sub-domains with commas (eg. <code>dogs.example-petstore.com, cats.example-petstore.com</code>)', 'google-analytics-for-wordpress' ),
-			'content' => $this->textinput( 'othercrossdomains' ),
-		);
-		$rows[]                       = array(
 			'id'      => 'customcode',
-			'label'   => __( 'Custom Code', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Not for the average user: this allows you to add a line of code, to be added before the <code>trackPageview</code> call.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Custom Code', 'gawp' ),
+			'desc'    => __( 'Not for the average user: this allows you to add a line of code, to be added before the <code>trackPageview</code> call.', 'gawp' ),
 			'content' => $this->textinput( 'customcode' ),
 		);
 		$rows[]                       = array(
 			'id'      => 'trackadsense',
-			'label'   => __( 'Track AdSense', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'This requires integration of your Analytics and AdSense account, for help, <a href="http://google.com/support/analytics/bin/answer.py?answer=92625">look here</a>.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Track AdSense', 'gawp' ),
+			'desc'    => __( 'This requires integration of your Analytics and AdSense account, for help, <a href="http://google.com/support/analytics/bin/answer.py?answer=92625">look here</a>.', 'gawp' ),
 			'content' => $this->checkbox( 'trackadsense' ),
 		);
 		$rows[]                       = array(
-			'id'      => 'gajslocalhosting',
-			'label'   => __( 'Host ga.js locally', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'gajslocalhosting' ) . '<div id="localhostingbox">
-											' . __( 'You have to provide a URL to your ga.js file:', 'google-analytics-for-wordpress' ) . '
-											<input type="text" name="gajsurl" size="30" value="' . $options['gajsurl'] . '"/>
-										</div>',
-			'desc'    => __( 'For some reasons you might want to use a locally hosted ga.js file, or another ga.js file, check the box and then please enter the full URL including http here.', 'google-analytics-for-wordpress' )
-		);
-		$rows[]                       = array(
-			'id'      => 'extrase',
-			'label'   => __( 'Track extra Search Engines', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'extrase' ) . '<div id="extrasebox">
-											' . __( 'You can provide a custom URL to the extra search engines file if you want:', 'google-analytics-for-wordpress' ) . '
-											<input type="text" name="extraseurl" size="30" value="' . $options['extraseurl'] . '"/>
-										</div>',
-		);
-		$rows[]                       = array(
 			'id'      => 'rsslinktagging',
-			'label'   => __( 'Tag links in RSS feed with campaign variables', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'Do not use this feature if you use FeedBurner, as FeedBurner can do this automatically, and better than this plugin can. Check <a href="http://www.google.com/support/feedburner/bin/answer.py?hl=en&amp;answer=165769">this help page</a> for info on how to enable this feature in FeedBurner.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Tag links in RSS feed with campaign variables', 'gawp' ),
+			'desc'    => __( 'Do not use this feature if you use FeedBurner, as FeedBurner can do this automatically, and better than this plugin can. Check <a href="http://www.google.com/support/feedburner/bin/answer.py?hl=en&amp;answer=165769">this help page</a> for info on how to enable this feature in FeedBurner.', 'gawp' ),
 			'content' => $this->checkbox( 'rsslinktagging' ),
 		);
 		$rows[]                       = array(
 			'id'      => 'trackregistration',
-			'label'   => __( 'Add tracking to the login and registration forms', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Add tracking to the login and registration forms', 'gawp' ),
 			'content' => $this->checkbox( 'trackregistration' ),
 		);
 		$rows[]                       = array(
 			'id'      => 'trackcommentform',
-			'label'   => __( 'Add tracking to the comment forms', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Add tracking to the comment forms', 'gawp' ),
 			'content' => $this->checkbox( 'trackcommentform' ),
 		);
 		$rows[]                       = array(
-			'id'      => 'allowanchor',
-			'label'   => __( 'Use # instead of ? for Campaign tracking', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'This adds a <code><a href="http://code.google.com/apis/analytics/docs/gaJSApiCampaignTracking.html#_gat.GA_Tracker_._setAllowAnchor">_setAllowAnchor</a></code> call to your tracking code, and makes RSS link tagging use a # as well.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'allowanchor' ),
-		);
-		$rows[]                       = array(
 			'id'      => 'allowlinker',
-			'label'   => __( 'Add <code>_setAllowLinker</code>', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'This adds a <code><a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setAllowLinker">_setAllowLinker</a></code> call to your tracking code,  allowing you to use <code>_link</code> and related functions.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Add <code>_setAllowLinker</code>', 'gawp' ),
+			'desc'    => __( 'This adds a <code><a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setAllowLinker">_setAllowLinker</a></code> call to your tracking code,  allowing you to use <code>_link</code> and related functions.', 'gawp' ),
 			'content' => $this->checkbox( 'allowlinker' ),
 		);
 		$rows[]                       = array(
-			'id'      => 'allowhash',
-			'label'   => __( 'Set <code>_setAllowHash</code> to false', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'This sets <code><a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApiDomainDirectory.html#_gat.GA_Tracker_._setAllowHash">_setAllowHash</a></code> to false, allowing you to track subdomains etc.', 'google-analytics-for-wordpress' ),
-			'content' => $this->checkbox( 'allowhash' ),
-		);
-		$rows[]                       = array(
 			'id'      => 'anonymizeip',
-			'label'   => __( 'Anonymize IP\'s', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'This adds <code><a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApi_gat.html#_gat._anonymizeIp">_anonymizeIp</a></code>, telling Google Analytics to anonymize the information sent by the tracker objects by removing the last octet of the IP address prior to its storage.', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Anonymize IP\'s', 'gawp' ),
+			'desc'    => __( 'This adds <code><a href="http://code.google.com/apis/analytics/docs/gaJS/gaJSApi_gat.html#_gat._anonymizeIp">_anonymizeIp</a></code>, telling Google Analytics to anonymize the information sent by the tracker objects by removing the last octet of the IP address prior to its storage.', 'gawp' ),
 			'content' => $this->checkbox( 'anonymizeip' ),
 		);
 		$modules['Advanced Settings'] = 'advancedgasettings';
-		$this->postbox( 'advancedgasettings', __( 'Advanced Settings', 'google-analytics-for-wordpress' ), $this->form_table( $rows ) . $this->save_button() );
+		$this->postbox( 'advancedgasettings', __( 'Advanced Settings', 'gawp' ), $this->form_table( $rows ) . $this->save_button() );
 
 		$rows                              = array();
 		$rows[]                            = array(
 			'id'      => 'internallink',
-			'label'   => __( 'Internal links to track as outbound', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'If you want to track all internal links that begin with <code>/out/</code>, enter <code>/out/</code> in the box above. If you have multiple prefixes you can separate them with comma\'s: <code>/out/,/recommends/</code>', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Internal links to track as outbound', 'gawp' ),
+			'desc'    => __( 'If you want to track all internal links that begin with <code>/out/</code>, enter <code>/out/</code> in the box above. If you have multiple prefixes you can separate them with comma\'s: <code>/out/,/recommends/</code>', 'gawp' ),
 			'content' => $this->textinput( 'internallink' ),
 		);
 		$rows[]                            = array(
 			'id'      => 'internallinklabel',
-			'label'   => __( 'Label to use', 'google-analytics-for-wordpress' ),
-			'desc'    => __( 'The label to use for these links, this will be added to where the click came from, so if the label is "aff", the label for a click from the content of an article becomes "outbound-article-aff".', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Label to use', 'gawp' ),
+			'desc'    => __( 'The label to use for these links, this will be added to where the click came from, so if the label is "aff", the label for a click from the content of an article becomes "outbound-article-aff".', 'gawp' ),
 			'content' => $this->textinput( 'internallinklabel' ),
 		);
 		$modules['Internal Link Tracking'] = 'internallinktracking';
-		$this->postbox( 'internallinktracking', __( 'Internal Links to Track as Outbound', 'google-analytics-for-wordpress' ), $this->form_table( $rows ) . $this->save_button() );
+		$this->postbox( 'internallinktracking', __( 'Internal Links to Track as Outbound', 'gawp' ), $this->form_table( $rows ) . $this->save_button() );
 
-		if ( defined( 'WPSC_VERSION' ) ) {
-			$pre_content = __( 'The WordPress e-Commerce plugin has been detected. This plugin can automatically add transaction tracking for you. To do that, <a href="http://yoast.com/wordpress/google-analytics/enable-ecommerce/">enable e-commerce for your reports in Google Analytics</a> and then check the box below.', 'google-analytics-for-wordpress' );
-			$rows        = array();
-			$rows[]      = array(
-				'id'      => 'wpec_tracking',
-				'label'   => __( 'Enable transaction tracking', 'google-analytics-for-wordpress' ),
-				'content' => $this->checkbox( 'wpec_tracking' ),
-			);
-			$this->postbox( 'wpecommerce', __( 'WordPress e-Commerce Settings', 'google-analytics-for-wordpress' ), $pre_content . $this->form_table( $rows ) . $this->save_button() );
-			$modules['WordPress e-Commerce'] = 'wpecommerce';
-		}
-
-		global $Shopp;
-		if ( isset( $Shopp ) ) {
-			$pre_content = __( 'The Shopp e-Commerce plugin has been detected. This plugin can automatically add transaction tracking for you. To do that, <a href="http://www.google.com/support/googleanalytics/bin/answer.py?hl=en&amp;answer=55528">enable e-commerce for your reports in Google Analytics</a> and then check the box below.', 'google-analytics-for-wordpress' );
-			$rows        = array();
-			$rows[]      = array(
-				'id'      => 'shopp_tracking',
-				'label'   => __( 'Enable transaction tracking', 'google-analytics-for-wordpress' ),
-				'content' => $this->checkbox( 'shopp_tracking' ),
-			);
-			$this->postbox( 'shoppecommerce', __( 'Shopp e-Commerce Settings', 'google-analytics-for-wordpress' ), $pre_content . $this->form_table( $rows ) . $this->save_button() );
-			$modules['Shopp'] = 'shoppecommerce';
-		}
-		$pre_content = '<p>' . sprintf( __( 'If you want to confirm that tracking on your blog is working as it should, enable this option and check the console in %sFirebug%s (for Firefox), %sFirebug Lite%s (for other browsers) or Chrome &amp; Safari\'s Web Inspector. Be absolutely sure to disable debugging afterwards, as it is slower than normal tracking.', 'google-analytics-for-wordpress' ), '<a href="http://getfirebug.com/">', '</a>', '<a href="http://getfirebug.com/firebuglite">', '</a>' ) . '</p>';
-		$pre_content .= '<p><strong>' . __( 'Note', 'google-analytics-for-wordpress' ) . '</strong>: ' . __( 'the debugging and firebug scripts are only loaded for admins.', 'google-analytics-for-wordpress' ) . '</p>';
+		$pre_content = '<p>' . sprintf( __( 'If you want to confirm that tracking on your blog is working as it should, enable this option and check the console in %sFirebug%s (for Firefox), %sFirebug Lite%s (for other browsers) or Chrome &amp; Safari\'s Web Inspector. Be absolutely sure to disable debugging afterwards, as it is slower than normal tracking.', 'gawp' ), '<a href="http://getfirebug.com/">', '</a>', '<a href="http://getfirebug.com/firebuglite">', '</a>' ) . '</p>';
+		$pre_content .= '<p><strong>' . __( 'Note', 'gawp' ) . '</strong>: ' . __( 'the debugging and firebug scripts are only loaded for admins.', 'gawp' ) . '</p>';
 		$rows   = array();
 		$rows[] = array(
 			'id'      => 'debug',
-			'label'   => __( 'Enable debug mode', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Enable debug mode', 'gawp' ),
 			'content' => $this->checkbox( 'debug' ),
 		);
 		$rows[] = array(
 			'id'      => 'firebuglite',
-			'label'   => __( 'Enable Firebug Lite', 'google-analytics-for-wordpress' ),
+			'label'   => __( 'Enable Firebug Lite', 'gawp' ),
 			'content' => $this->checkbox( 'firebuglite' ),
 		);
-		$this->postbox( 'debugmode', __( 'Debug Mode', 'google-analytics-for-wordpress' ), $pre_content . $this->form_table( $rows ) . $this->save_button() );
+		$this->postbox( 'debugmode', __( 'Debug Mode', 'gawp' ), $pre_content . $this->form_table( $rows ) . $this->save_button() );
 		$modules['Debug Mode'] = 'debugmode';
 		?>
     </form>
     <form action="<?php echo $this->plugin_options_url(); ?>" method="post"
-          onsubmit="javascript:return(confirm('<?php _e( 'Do you really want to reset all settings?', 'google-analytics-for-wordpress' ); ?>'));">
+          onsubmit="javascript:return(confirm('<?php _e( 'Do you really want to reset all settings?', 'gawp' ); ?>'));">
         <input type="hidden" name="reset" value="true"/>
         <input type="hidden" name="plugin" value="google-analytics-for-wordpress"/>
 
-        <div class="submit"><input type="submit" value="<?php _e( 'Reset All Settings &raquo;', 'google-analytics-for-wordpress' ); ?>'"/></div>
+        <div class="submit"><input type="submit" value="<?php _e( 'Reset All Settings &raquo;', 'gawp' ); ?>'"/></div>
     </form>
     </div>
     </div>
@@ -695,24 +552,23 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
         <div class="metabox-holder">
             <div class="meta-box-sortables">
 				<?php
-				$this->postbox( 'spread', '<strong>' . __( 'Help Spread the Word!', 'google-analytics-for-wordpress' ) . '</strong>',
+				$this->postbox( 'spread', '<strong>' . __( 'Help Spread the Word!', 'gawp' ) . '</strong>',
 					'<ul>'
-						. '<li><a href="http://wordpress.org/extend/plugins/google-analytics-for-wordpress/">' . __( 'Rate the plugin 5★ on WordPress.org', 'google-analytics-for-wordpress' ) . '</a></li>'
-						. '<li><a href="http://wordpress.org/tags/google-analytics-for-wordpress">' . __( 'Help out other users in the forums', 'google-analytics-for-wordpress' ) . '</a></li>'
+						. '<li><a href="http://wordpress.org/plugins/google-analytics-for-wordpress/">' . __( 'Rate the plugin 5★ on WordPress.org', 'gawp' ) . '</a></li>'
+						. '<li><a href="http://wordpress.org/tags/google-analytics-for-wordpress">' . __( 'Help out other users in the forums', 'gawp' ) . '</a></li>'
 						. '<li>' . sprintf( __( 'Blog about it & link to the %1$splugin page%2$s' ), '<a href="http://yoast.com/wordpress/google-analytics/#utm_source=wpadmin&utm_medium=sidebanner&utm_term=link&utm_campaign=wpgaplugin">', '</a>' ) . '</li></ul>' );
 				?>
-							<a target="_blank"
-								 href="https://yoast.com/hire-us/create-ga-goals/#utm_source=gawp-config&utm_medium=banner&utm_campaign=ga-goals-banner"><img
-										src="<?php echo GAWP_URL; ?>images/banner-ga-goals.png" alt="Google Analytics Goals"/></a><br/>
-							<br/>
-							<a target="_blank"
-								 href="https://yoast.com/hire-us/website-review/#utm_source=gawp-config&utm_medium=banner&utm_campaign=website-review-banner"><img
-										src="<?php echo GAWP_URL; ?>images/banner-website-review.png" alt="Website Review"/></a><br/>
-							<br/>
-							<a target="_blank"
-								 href="https://yoast.com/hire-us/conversion-review/#utm_source=gawp-config&utm_medium=banner&utm_campaign=conversion-review-banner"><img
-										src="<?php echo GAWP_URL; ?>images/banner-conversion-review.png" alt="Conversion Review"/></a>
-						</div>
+<a target="_blank"
+	 href="https://yoast.com/hire-us/create-ga-goals/#utm_source=gawp-config&utm_medium=banner&utm_campaign=website-review-banner"><img
+			src="<?php echo GAWP_URL; ?>images/banner-ga-goals.png" alt="Google Analytics Goals"/></a><br/>
+			<br/>
+<a target="_blank"
+  href="https://yoast.com/hire-us/website-review/#utm_source=gawp-config&utm_medium=banner&utm_campaign=website-review-banner"><img
+       src="<?php echo GAWP_URL; ?>images/banner-website-review.png" alt="Website Review"/></a><br/>
+			<br/>
+			<a target="_blank"
+				 href="https://yoast.com/hire-us/conversion-review/#utm_source=gawp-config&utm_medium=banner&utm_campaign=conversion-review-banner"><img
+						src="<?php echo GAWP_URL; ?>images/banner-conversion-review.png" alt="Conversion Review"/></a>            </div>
             <br/><br/><br/>
         </div>
     </div>
@@ -724,17 +580,8 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 		$options = array(
 			'advancedsettings'   => false,
 			'allowanchor'        => false,
-			'allowhash'          => false,
 			'allowlinker'        => false,
 			'anonymizeip'        => false,
-			'customcode'         => '',
-			'cv_loggedin'        => false,
-			'cv_authorname'      => false,
-			'cv_category'        => false,
-			'cv_all_categories'  => false,
-			'cv_tags'            => false,
-			'cv_year'            => false,
-			'cv_post_type'       => false,
 			'debug'              => false,
 			'dlextensions'       => 'doc,exe,js,pdf,ppt,tgz,zip,xls',
 			'domain'             => '',
@@ -744,19 +591,12 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 			'firebuglite'        => false,
 			'ga_token'           => '',
 			'ga_api_responses'   => array(),
-			'gajslocalhosting'   => false,
-			'gajsurl'            => '',
 			'ignore_userlevel'   => '11',
 			'internallink'       => false,
 			'internallinklabel'  => '',
-			'outboundpageview'   => false,
-			'downloadspageview'  => false,
-			'othercrossdomains'  => '',
 			'position'           => 'footer',
-			'primarycrossdomain' => '',
 			'theme_updated'      => false,
 			'trackcommentform'   => true,
-			'trackcrossdomain'   => false,
 			'trackadsense'       => false,
 			'trackoutbound'      => true,
 			'trackregistration'  => false,
@@ -771,7 +611,7 @@ class GA_Admin extends Yoast_GA_Plugin_Admin {
 	function warning() {
 		$options = get_option( $this->optionname );
 		if ( !isset( $options['uastring'] ) || empty( $options['uastring'] ) ) {
-			echo "<div id='message' class='error'><p><strong>" . __( "Google Analytics is not active.", 'google-analytics-for-wordpress' ) . "</strong> " . sprintf( __( "You must %sselect which Analytics Profile to track%s before it can work.", 'google-analytics-for-wordpress' ), "<a href='" . $this->plugin_options_url() . "'>", "</a>" ) . "</p></div>";
+			echo "<div id='message' class='error'><p><strong>" . __( "Google Analytics is not active.", 'gawp' ) . "</strong> " . sprintf( __( "You must %sselect which Analytics Profile to track%s before it can work.", 'gawp' ), "<a href='" . $this->plugin_options_url() . "'>", "</a>" ) . "</p></div>";
 		}
 	} // end warning()
 
