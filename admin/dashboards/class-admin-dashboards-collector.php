@@ -117,9 +117,8 @@ if ( ! class_exists( 'Yoast_GA_Dashboards_Collector' ) ) {
 		 * Check if the WP cron did run yesterday. If not, we need to run it form here
 		 */
 		public function check_api_call_hook( ) {
-			delete_option('yst_ga_last_wp_run');
 			$last_run = $this->get_last_aggregate_run();
-			echo $last_run;
+
 			if ( $last_run === false ) {
 				/**
 				 * Transient doesn't exists, so we need to run the
