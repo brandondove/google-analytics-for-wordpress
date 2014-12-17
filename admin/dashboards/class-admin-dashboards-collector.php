@@ -117,8 +117,9 @@ if ( ! class_exists( 'Yoast_GA_Dashboards_Collector' ) ) {
 		 * Check if the WP cron did run yesterday. If not, we need to run it form here
 		 */
 		public function check_api_call_hook( ) {
+			delete_option('yst_ga_last_wp_run');
 			$last_run = $this->get_last_aggregate_run();
-
+			echo $last_run;
 			if ( $last_run === false ) {
 				/**
 				 * Transient doesn't exists, so we need to run the
@@ -141,7 +142,7 @@ if ( ! class_exists( 'Yoast_GA_Dashboards_Collector' ) ) {
 		 * @return datetime
 		 */
 		private function get_last_aggregate_run() {
-			return get_transient( 'yst_ga_last_wp_run' );
+			return get_option( 'yst_ga_last_wp_run' );
 		}
 
 		/**
@@ -396,10 +397,10 @@ if ( ! class_exists( 'Yoast_GA_Dashboards_Collector' ) ) {
 				}
 
 				/**
-				 * Success, set a transient which stores the latest runtime
+				 * Success, set an option which stores the latest runtime
 				 */
 				if ( ! empty( $response ) ) {
-					set_transient( 'yst_ga_last_wp_run', date( 'Y-m-d' ), 48 * HOUR_IN_SECONDS );
+					update_option( 'yst_ga_last_wp_run', date( 'Y-m-d H:i:s' ) );
 				}
 
 				return Yoast_GA_Dashboards_Data::set( $name, $response, strtotime( $start_date ), strtotime( $end_date ), $store_as );
