@@ -82,6 +82,36 @@ class Yoast_GA_Options {
 	}
 
 	/**
+	 * Get the option's value
+	 *
+	 * @param string                $key
+	 * @param string|array|bool|int $default
+	 *
+	 * @return string|array|bool|int
+	 */
+	public function get( $key, $default ) {
+		if( isset($this->options[ $key ]) ){
+			return $this->options[ $key ];
+		}
+
+		return $default;
+	}
+
+	/**
+	 * Set an option's value
+	 *
+	 * @param string                $key
+	 * @param string|array|bool|int $value
+	 *
+	 * @return bool
+	 */
+	public function set( $key, $value ) {
+		$this->options[ $key ] = $value;
+
+		return update_option( $this->option_name, $this->options );
+	}
+
+	/**
 	 * Updates the GA option within the current option_prefix
 	 *
 	 * @param array $val
@@ -261,6 +291,7 @@ class Yoast_GA_Options {
 			)
 		);
 		$options = apply_filters( 'yst_ga_default-ga-values', $options, $this->option_prefix );
+
 		return $options;
 	}
 
