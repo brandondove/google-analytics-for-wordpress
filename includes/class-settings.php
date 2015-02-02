@@ -3,54 +3,44 @@
 class Yoast_GA_Settings {
 
 	/**
-	 * Saving instance of it's own in this static var
-	 *
-	 * @var object
-	 */
-	private static $instance;
-
-	/**
-	 * Store the options class instance
-	 *
-	 * @var mixed|void
-	 */
-	private $options_class;
-
-	/**
 	 * The main GA options
 	 *
 	 * @var
 	 */
-	private $options;
-
-	/**
-	 * Set the options of Google Analytics
-	 */
-	protected function __construct() {
-		$this->options_class = Yoast_GA_Options::instance();
-		$this->options       = $this->options_class->get_options();
-	}
-
-	/**
-	 * Getting instance of this object. If instance doesn't exists it will be created.
-	 *
-	 * @return object|Yoast_GA_Settings
-	 */
-	public static function get_instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new Yoast_GA_Settings();
-		}
-
-		return self::$instance;
-	}
+	private static $options;
 
 	/**
 	 * Return the Dashboards disabled bool
 	 *
 	 * @return bool
 	 */
-	public function dashboards_disabled() {
-		return $this->options_class->option_value_to_bool( 'dashboards_disabled' );
+	public static function dashboards_disabled() {
+		return Yoast_GA_Options::instance()->option_value_to_bool( 'dashboards_disabled' );
+	}
+
+	/**
+	 * Get the tracking code
+	 *
+	 * @return string
+	 */
+	public static function get_tracking_code() {
+		return 'UA-1244';
+	}
+
+	/**
+	 * Get bool if universal is enabled
+	 *
+	 * @return bool
+	 */
+	public static function universal_enabled() {
+		return true;
+	}
+
+	/**
+	 * Deprecated?
+	 */
+	private static function check_options() {
+		Yoast_GA_Options::instance()->get_options();
 	}
 
 }

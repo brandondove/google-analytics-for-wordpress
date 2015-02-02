@@ -15,6 +15,7 @@ if ( ! class_exists( 'Yoast_GA_Autoload' ) ) {
 				self::$classes = array(
 					'yoast_ga_options'                    => 'includes/class-options',
 					'yoast_ga_settings'                   => 'includes/class-settings',
+					'yoast_ga_upgrade'                    => 'includes/class-upgrade',
 					'yoast_ga_utils'                      => 'includes/class-utils',
 
 					// Frontend classes
