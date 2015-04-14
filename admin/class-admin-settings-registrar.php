@@ -46,11 +46,8 @@ class Yoast_GA_Admin_Settings_Registrar {
 	public function __construct() {
 		add_action( 'admin_notices', array( $this, 'yst_ga_settings_errors' ) );
 		add_action( 'admin_init', array( $this, 'init_default_options' ) );
-		add_action( 'admin_init', array( $this, 'yst_ga_settings_init_ua_code' ) );
-		add_action( 'admin_init', array( $this, 'yst_ga_settings_init_general' ) );
-		add_action( 'admin_init', array( $this, 'yst_ga_settings_init_universal' ) );
-		add_action( 'admin_init', array( $this, 'yst_ga_settings_init_advanced' ) );
-		add_action( 'admin_init', array( $this, 'yst_ga_settings_init_debug' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
 
 		if ( filter_input( INPUT_GET, 'settings-updated' ) ) {
 			add_action( 'admin_init', array( $this, 'update_ga_tracking_from_profile' ) );
@@ -78,9 +75,20 @@ class Yoast_GA_Admin_Settings_Registrar {
 	}
 
 	/**
+	 * Registers the settings on admin init.
+	 */
+	public function register_settings() {
+		$this->register_ua_code();
+		$this->register_general_settings();
+		$this->register_universal_settings();
+		$this->register_advanced_settings();
+		$this->register_debug_settings();
+	}
+
+	/**
 	 * Init the UA code block
 	 */
-	public function yst_ga_settings_init_ua_code() {
+	private function register_ua_code() {
 		$section_name = 'ua_code';
 
 		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
@@ -124,7 +132,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 	/**
 	 * Init the general tab
 	 */
-	public function yst_ga_settings_init_general() {
+	private function register_general_settings() {
 		$section_name = 'general';
 
 		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
@@ -184,7 +192,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 	/**
 	 * Init the universal tab
 	 */
-	public function yst_ga_settings_init_universal() {
+	private function register_universal_settings() {
 		$section_name = 'universal';
 
 		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
@@ -224,7 +232,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 	/**
 	 * Init the advanced tab
 	 */
-	public function yst_ga_settings_init_advanced() {
+	private function register_advanced_settings() {
 		$section_name = 'advanced';
 
 		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
@@ -331,7 +339,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 	/**
 	 * Init the debug tab
 	 */
-	public function yst_ga_settings_init_debug() {
+	private function register_debug_settings() {
 		$section_name = 'debug';
 
 		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga', array( $this, 'validate_options_ua_code' ) );
