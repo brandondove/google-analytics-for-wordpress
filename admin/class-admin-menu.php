@@ -123,19 +123,17 @@ class Yoast_GA_Admin_Menu {
 	/**
 	 * Prepares an array that can be used to add a submenu page to the Google Analytics for Wordpress menu
 	 *
-	 * @param string $submenu_name
-	 * @param string $submenu_slug
-	 * @param string $font_color
+	 * @param array $submenu
 	 *
 	 * @return array
 	 */
-	private function prepare_submenu_page( $submenu_name, $submenu_slug, $font_color = '' ) {
+	private function prepare_submenu_page( $submenu ) {
 		return array(
 			'parent_slug'      => $this->parent_slug,
-			'page_title'       => __( 'Yoast Google Analytics:', 'google-analytics-for-wordpress' ) . ' ' . $submenu_name,
-			'menu_title'       => $this->parse_menu_title( $submenu_name, $font_color ),
-			'capability'       => 'manage_options',
-			'menu_slug'        => 'yst_ga_' . $submenu_slug,
+			'page_title'       => __( 'Yoast Google Analytics:', 'google-analytics-for-wordpress' ) . ' ' . $submenu['label'],
+			'menu_title'       => $this->parse_menu_title( $submenu['label'], $submenu['color'] ),
+			'capability'       => $submenu['capability'],
+			'menu_slug'        => 'yst_ga_' . $submenu['slug'],
 			'submenu_function' => array( $this->target_object, 'load_page' ),
 		);
 	}
@@ -194,12 +192,8 @@ class Yoast_GA_Admin_Menu {
 	 */
 	private function add_submenu_pages() {
 		foreach ( $this->get_submenu_types() as $submenu ) {
-			if ( isset( $submenu['color'] ) ) {
-				$submenu_page = $this->prepare_submenu_page( $submenu['label'], $submenu['slug'], $submenu['color'] );
-			}
-			else {
-				$submenu_page = $this->prepare_submenu_page( $submenu['label'], $submenu['slug'] );
-			}
+			$submenu_page = $this->prepare_submenu_page( $submenu );
+
 			$this->add_submenu_page( $submenu_page );
 		}
 	}
@@ -219,9 +213,10 @@ class Yoast_GA_Admin_Menu {
 		 *
 		 * array(
 		 *   $submenu_name => array(
-		 *        'color' => $font_color,
-		 *        'label' => __( 'text-label', 'google-analytics-for-wordpress' ),
-		 * 		  'slug'  => $menu_slug,
+		 *        'color'      => $font_color,
+		 *        'label' 	   => __( 'text-label', 'google-analytics-for-wordpress' ),
+		 *        'slug'  	   => $menu_slug,
+		 *        'capability' => 'manage_options',
 		 *        ),
 		 *   ..,
 		 * )
@@ -235,21 +230,26 @@ class Yoast_GA_Admin_Menu {
 
 			if ( ! $this->dashboards_disabled ) {
 				$submenu_types['dashboard'] = array(
-					'label' => __( 'Dashboard', 'google-analytics-for-wordpress' ),
-					'slug'  => 'dashboard',
+					'color'      => null,
+					'label'      => __( 'Dashboard', 'google-analytics-for-wordpress' ),
+					'slug'       => 'dashboard',
+					'capability' => 'manage_options',
 				);
 			}
 
 			$submenu_types['settings'] = array(
-				'label' => __( 'Settings', 'google-analytics-for-wordpress' ),
-				'slug'  => 'settings',
+				'color'      => null,
+				'label'      => __( 'Settings', 'google-analytics-for-wordpress' ),
+				'slug'       => 'settings',
+				'capability' => 'manage_options',
 			);
 		}
 
 		$submenu_types['extensions'] = array(
-			'color' => '#f18500',
-			'label' => __( 'Extensions', 'google-analytics-for-wordpress' ),
-			'slug'  => 'extensions',
+			'color'      => '#f18500',
+			'label'      => __( 'Extensions', 'google-analytics-for-wordpress' ),
+			'slug'       => 'extensions',
+			'capability' => 'manage_options',
 		);
 
 		return $submenu_types;
