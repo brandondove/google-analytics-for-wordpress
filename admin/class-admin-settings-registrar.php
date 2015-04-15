@@ -256,11 +256,31 @@ class Yoast_GA_Admin_Settings_Registrar {
 			),
 		);
 
-//		$this->register_ua_code();
-//		$this->register_general_settings();
-//		$this->register_universal_settings();
-//		$this->register_advanced_settings();
-//		$this->register_debug_settings();
+		$this->register_sections( array( 'general', 'universal', 'advanced', 'debug' ) );
+	}
+
+	/**
+	 * Register all given sections
+	 *
+	 * @param array $section_keys
+	 */
+	private function register_sections( $section_keys = array() ) {
+		foreach( $section_keys as $section_name ){
+			register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
+
+			$this->create_section( $section_name );
+
+			foreach( $this->registered_fields[ $section_name ] as $field ){
+				$this->add_field(
+					$field['name'],
+					$field['label'],
+					$field['type'],
+					$field['args']
+				);
+			}
+
+			$this->close_section( $section_name );
+		}
 	}
 
 	/**
@@ -306,236 +326,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 
 		$this->close_section( $section_name );
 	}
-
-	/**
-	 * Init the general tab
-	 */
-	private function register_general_settings() {
-		$section_name = 'general';
-
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
-
-		$this->create_section( $section_name );
-
-		$this->add_field(
-			'track_outbound',
-			__( 'Track outbound click and downloads', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'Clicks and downloads will be tracked as events, you can find these under Content &#xBB; Event Tracking in your Google Analytics reports.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'anonymous_data',
-			__( 'Allow tracking of anonymous data', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'By allowing us to track anonymous data we can better help you, because we know with which WordPress configurations, themes and plugins we should test. No personal data will be submitted.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'anonymize_ips',
-			__( 'Anonymize IPs', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'This adds %1$s, telling Google Analytics to anonymize the information sent by the tracker objects by removing the last octet of the IP address prior to its storage.', 'google-analytics-for-wordpress' ), '<a href="https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApi_gat?csw=1#_gat._anonymizeIp" target="_blank"><code>_anonymizeIp</code></a>' ),
-			)
-		);
-
-		$this->add_field(
-			'ignore_users',
-			__( 'Ignore users', 'google-analytics-for-wordpress' ),
-			'select',
-			array(
-				'help'       => __( 'Users of the role you select will be ignored, so if you select Editor, all Editors will be ignored.', 'google-analytics-for-wordpress' ),
-				'attributes' => ' multiple="true" style="width: 365px;" class="chosen"',
-				'options'    => $this->default_options['user_roles'],
-			)
-		);
-
-		$this->add_field(
-			'dashboards_disabled',
-			__( 'Disable analytics dashboard', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'This will completely disable the dashboard and stop the plugin from fetching the latest analytics data.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->close_section( $section_name );
-	}
-
-	/**
-	 * Init the universal tab
-	 */
-	private function register_universal_settings() {
-		$section_name = 'universal';
-
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
-
-		$this->create_section( $section_name );
-
-		$this->add_field(
-			'enable_universal',
-			__( 'Enable universal', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'First enable Universal tracking in your Google Analytics account. Please read %1$sthis guide%2$s to learn how to do that.', 'google-analytics-for-wordpress' ), '<a href="http://kb.yoast.com/article/125-universal-analytics#utm_medium=kb-link&utm_source=gawp-config&utm_campaign=wpgaplugin" target="_blank">', '</a>' ),
-			)
-		);
-
-		$this->add_field(
-			'demographics',
-			__( 'Enable Demographics and Interest Reports', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'You have to enable the Demographics in Google Analytics before you can see the tracking data. We have a knowledge base article in our %1$sknowledge base%2$s about this feature.', 'google-analytics-for-wordpress' ), '<a href="http://kb.yoast.com/article/154-enable-demographics-and-interests-report-in-google-analytics/#utm_medium=kb-link&amp;utm_source=gawp-config&amp;utm_campaign=wpgaplugin" target="_blank">', '</a>' ),
-			)
-		);
-
-		$this->add_field(
-			'enhanced_link_attribution',
-			__( 'Enhanced Link Attribution', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'Add %1$sEnhanced Link Attribution%2$s to your tracking code.', 'google-analytics-for-wordpress' ), '<a href="https://support.google.com/analytics/answer/2558867" target="_blank">', ' </a>' )
-			)
-		);
-
-		$this->close_section( $section_name );
-	}
-
-	/**
-	 * Init the advanced tab
-	 */
-	private function register_advanced_settings() {
-		$section_name = 'advanced';
-
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
-
-		$this->create_section( $section_name );
-
-		$this->add_field(
-			'track_download_as',
-			__( 'Track downloads as', 'google-analytics-for-wordpress' ),
-			'select',
-			array(
-				'help'       => __( 'Not recommended, as this would skew your statistics, but it does make it possible to track downloads as goals.', 'google-analytics-for-wordpress' ),
-				'options'    => $this->default_options['track_download_types'],
-				'attributes' => ' class="chosen"',
-			)
-		);
-
-		$this->add_field(
-			'extensions_of_files',
-			__( 'Extensions of files to track as downloads', 'google-analytics-for-wordpress' ),
-			'text',
-			array(
-				'help' => __( 'Please separate extensions using commas', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'track_full_url',
-			__( 'Track full URL of outbound clicks or just the domain', 'google-analytics-for-wordpress' ),
-			'select',
-			array(
-				'help'       => __( 'How should we track your outbound clicks?', 'google-analytics-for-wordpress' ),
-				'options'    => $this->default_options['track_full_url'],
-				'attributes' => ' class="chosen"',
-			)
-		);
-
-		$this->add_field(
-			'subdomain_tracking',
-			__( 'Subdomain tracking', 'google-analytics-for-wordpress' ),
-			'text',
-			array(
-				'help' => sprintf( __( 'This allows you to set the domain that\'s set by %1$s for tracking subdomains.<br/>If empty, this will not be set.', 'google-analytics-for-wordpress' ), '<a href="https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiDomainDirectory#_gat.GA_Tracker_._setDomainName" target="_blank"><code>_setDomainName</code></a>' ),
-			)
-		);
-
-		$this->add_field(
-			'track_internal_as_outbound',
-			__( 'Set path for internal links to track as outbound links', 'google-analytics-for-wordpress' ),
-			'text',
-			array(
-				'help' => sprintf( __( 'If you want to track all internal links that begin with %1$s, enter %1$s in the box above. If you have multiple prefixes you can separate them with comma\'s: %2$s', 'google-analytics-for-wordpress' ), '<code>/out/</code>', '<code>/out/,/recommends/</code>' ),
-			)
-		);
-
-		$this->add_field(
-			'track_internal_as_label',
-			__( 'Label for those links', 'google-analytics-for-wordpress' ),
-			'text',
-			array(
-				'help' => __( 'The label to use for these links, this will be added to where the click came from, so if the label is "aff", the label for a click from the content of an article becomes "outbound-article-aff".', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'tag_links_in_rss',
-			__( 'Tag links in RSS feed with campaign variables', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'Do not use this feature if you use FeedBurner, as FeedBurner can do this automatically and better than this plugin can. Check <a href="https://support.google.com/feedburner/answer/165769?hl=en&amp;ref_topic=13075" target="_blank">this help page</a> for info on how to enable this feature in FeedBurner.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'allow_anchor',
-			__( 'Tag links in RSS feed with campaign variables', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'This adds a %1$s call to your tracking code, and makes RSS link tagging use a %2$s as well.', 'google-analytics-for-wordpress' ), '<a href="https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiCampaignTracking?csw=1#_gat.GA_Tracker_._setAllowAnchor" target="_blank"><code>_setAllowAnchor</code></a>', '<code>#</code>' ),
-			)
-		);
-
-		$this->add_field(
-			'add_allow_linker',
-			__( 'Add <code>_setAllowLinker</code>', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => sprintf( __( 'This adds a %1$s call to your tracking code, allowing you to use %2$s and related functions.', 'google-analytics-for-wordpress' ), '<a href="https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiDomainDirectory?csw=1#_gat.GA_Tracker_._setAllowLinker" target="_blank"><code>_setAllowLinker</code></a>', ' <code>_link</code>' ),
-			)
-		);
-
-		$this->add_field(
-			'custom_code',
-			__( 'Custom code', 'google-analytics-for-wordpress' ),
-			'textarea',
-			array(
-				'help' => sprintf( __( 'Not for the average user: this allows you to add a line of code, to be added before the %1$s call.', 'google-analytics-for-wordpress' ), '<a href="https://developers.google.com/analytics/devguides/collection/gajs/methods/gaJSApiBasicConfiguration#_gat.GA_Tracker_._trackPageview" target="_blank"><code>_trackPageview</code></a>' ),
-			)
-		);
-
-		$this->close_section( $section_name );
-	}
-
-	/**
-	 * Init the debug tab
-	 */
-	private function register_debug_settings() {
-		$section_name = 'debug';
-
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga', array( $this, 'validate_options_ua_code' ) );
-
-		$this->create_section( $section_name );
-
-		$this->add_field(
-			'debug_mode',
-			__( 'Enable debug mode', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'Not recommended, as this would skew your statistics, but it does make it possible to track downloads as goals.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->close_section( $section_name );
-	}
-
+	
 	/**
 	 * Validate the UA code options
 	 *
