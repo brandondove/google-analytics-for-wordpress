@@ -85,8 +85,35 @@ class Yoast_GA_Admin_Settings_Registrar {
 	 */
 	public function register_settings() {
 		$this->registered_fields = array(
-			'ua_code'   => array(),
-			'general'   => array(
+			'ua_code' => array(
+				array(
+					'name'  => 'analytics_profile',
+					'label' => __( 'Google Analytics profile', 'google-analytics-for-wordpress' ),
+					'type'  => 'select_profile',
+					'args'  => array(
+						'help'       => __( 'Select an analytics profile from your Google account to use for the tracking on this website.', 'google-analytics-for-wordpress' ),
+						'attributes' => ' class="chosen"',
+						'options'    => $this->default_options['analytics_profile'],
+					)
+				),
+				array(
+					'name'  => 'manual_ua_code',
+					'label' => __( 'Use a manual UA code', 'google-analytics-for-wordpress' ),
+					'type'  => 'checkbox',
+					'args'  => array(
+						'help' => __( 'You can use the manual UA code field to enter your UA code manually, instead of using the Google Authenticator.', 'google-analytics-for-wordpress' ),
+					)
+				),
+				array(
+					'name'  => 'manual_ua_code_field',
+					'label' => __( 'Enter your UA code here', 'google-analytics-for-wordpress' ),
+					'type'  => 'text',
+					'args'  => array(
+						'help' => __( 'Enter the UA code (e.g.: UA-1234567-89) here, you can find the correct UA code in your Google Analytics dashboard.', 'google-analytics-for-wordpress' ),
+					)
+				),
+			),
+			'general' => array(
 				array(
 					'name'  => 'track_outbound',
 					'label' => __( 'Track outbound click and downloads', 'google-analytics-for-wordpress' ),
@@ -254,7 +281,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 			),
 		);
 
-		$this->register_sections( array( 'general', 'universal', 'advanced', 'debug' ) );
+		$this->register_sections( array( 'ua_code', 'general', 'universal', 'advanced', 'debug' ) );
 	}
 
 	/**
@@ -290,50 +317,6 @@ class Yoast_GA_Admin_Settings_Registrar {
 				$field['args']
 			);
 		}
-
-		$this->close_section( $section_name );
-	}
-
-	/**
-	 * Init the UA code block
-	 */
-	private function register_ua_code() {
-		$section_name = 'ua_code';
-
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
-
-		$this->create_section( $section_name );
-
-		if ( ! empty( $this->default_options['analytics_profile'] ) && count( $this->default_options['analytics_profile'] ) >= 1 ) {
-			$this->add_field(
-				'analytics_profile',
-				__( 'Google Analytics profile', 'google-analytics-for-wordpress' ),
-				'select_profile',
-				array(
-					'help'       => __( 'Select an analytics profile from your Google account to use for the tracking on this website.', 'google-analytics-for-wordpress' ),
-					'attributes' => ' class="chosen"',
-					'options'    => $this->default_options['analytics_profile'],
-				)
-			);
-		}
-
-		$this->add_field(
-			'manual_ua_code',
-			__( 'Use a manual UA code', 'google-analytics-for-wordpress' ),
-			'checkbox',
-			array(
-				'help' => __( 'You can use the manual UA code field to enter your UA code manually, instead of using the Google Authenticator.', 'google-analytics-for-wordpress' ),
-			)
-		);
-
-		$this->add_field(
-			'manual_ua_code_field',
-			__( 'Enter your UA code here', 'google-analytics-for-wordpress' ),
-			'text',
-			array(
-				'help' => __( 'Enter the UA code (e.g.: UA-1234567-89) here, you can find the correct UA code in your Google Analytics dashboard.', 'google-analytics-for-wordpress' ),
-			)
-		);
 
 		$this->close_section( $section_name );
 	}
