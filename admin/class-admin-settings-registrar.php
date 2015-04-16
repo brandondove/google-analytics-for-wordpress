@@ -85,10 +85,8 @@ class Yoast_GA_Admin_Settings_Registrar {
 	 */
 	public function register_settings() {
 		$this->registered_fields = array(
-			'ua_code'	=>	array(
-
-			),
-			'general'	=>	array(
+			'ua_code'   => array(),
+			'general'   => array(
 				array(
 					'name'  => 'track_outbound',
 					'label' => __( 'Track outbound click and downloads', 'google-analytics-for-wordpress' ),
@@ -132,7 +130,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 					)
 				),
 			),
-			'universal'	=>	array(
+			'universal' => array(
 				array(
 					'name'  => 'enable_universal',
 					'label' => __( 'Enable universal', 'google-analytics-for-wordpress' ),
@@ -158,7 +156,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 					)
 				),
 			),
-			'advanced'	=>	array(
+			'advanced'  => array(
 				array(
 					'name'  => 'track_download_as',
 					'label' => __( 'Track downloads as', 'google-analytics-for-wordpress' ),
@@ -244,7 +242,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 					)
 				),
 			),
-			'debug'	=>	array(
+			'debug'     => array(
 				array(
 					'name'  => 'debug_mode',
 					'label' => __( 'Enable debug mode', 'google-analytics-for-wordpress' ),
@@ -265,11 +263,11 @@ class Yoast_GA_Admin_Settings_Registrar {
 	 * @param array $section_keys
 	 */
 	private function register_sections( $section_keys = array() ) {
-		if( ! is_array( $section_keys ) ){
+		if ( ! is_array( $section_keys ) ) {
 			return;
 		}
 
-		foreach( $section_keys as $section_name ){
+		foreach ( $section_keys as $section_name ) {
 			$this->add_section( $section_name );
 		}
 	}
@@ -284,7 +282,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 
 		$this->create_section( $section_name );
 
-		foreach( $this->registered_fields[ $section_name ] as $field ){
+		foreach ( $this->registered_fields[ $section_name ] as $field ) {
 			$this->add_field(
 				$field['name'],
 				$field['label'],

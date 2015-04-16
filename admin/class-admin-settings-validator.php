@@ -8,12 +8,15 @@
  */
 class Yoast_GA_Admin_Settings_Validator {
 
+	/**
+	 * @var array
+	 */
 	private $fields = array();
 
 	/**
 	 * On construct, get the fields from the registrar to verfiy them.
 	 *
-	 * @param $fields
+	 * @param array $fields
 	 */
 	public function __construct( $fields ) {
 		$this->fields = $fields;
