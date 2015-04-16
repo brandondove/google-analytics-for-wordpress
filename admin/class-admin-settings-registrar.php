@@ -265,22 +265,35 @@ class Yoast_GA_Admin_Settings_Registrar {
 	 * @param array $section_keys
 	 */
 	private function register_sections( $section_keys = array() ) {
-		foreach( $section_keys as $section_name ){
-			register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
-
-			$this->create_section( $section_name );
-
-			foreach( $this->registered_fields[ $section_name ] as $field ){
-				$this->add_field(
-					$field['name'],
-					$field['label'],
-					$field['type'],
-					$field['args']
-				);
-			}
-
-			$this->close_section( $section_name );
+		if( ! is_array( $section_keys ) ){
+			return;
 		}
+
+		foreach( $section_keys as $section_name ){
+			$this->add_section( $section_name );
+		}
+	}
+
+	/**
+	 * Register a section
+	 *
+	 * @param string $section_name
+	 */
+	private function add_section( $section_name ) {
+		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
+
+		$this->create_section( $section_name );
+
+		foreach( $this->registered_fields[ $section_name ] as $field ){
+			$this->add_field(
+				$field['name'],
+				$field['label'],
+				$field['type'],
+				$field['args']
+			);
+		}
+
+		$this->close_section( $section_name );
 	}
 
 	/**
@@ -326,7 +339,7 @@ class Yoast_GA_Admin_Settings_Registrar {
 
 		$this->close_section( $section_name );
 	}
-	
+
 	/**
 	 * Validate the UA code options
 	 *
