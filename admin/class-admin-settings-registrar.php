@@ -32,20 +32,19 @@ class Yoast_GA_Admin_Settings_Registrar {
 		'track_full_url'       => array(),
 		'analytics_profile'    => array(),
 	);
-
-	/**
-	 * Amount of errors on validation
-	 *
-	 * @var integer
-	 */
-	private $errors = 0;
-
 	/**
 	 * The fields array with all fields for the settings API.
 	 *
 	 * @var array
 	 */
 	private $registered_fields = array();
+
+	/**
+	 * Validator resource
+	 *
+	 * @var resource
+	 */
+	private $validator = array();
 
 	/**
 	 * Construct the new admin settings api forms
@@ -58,6 +57,8 @@ class Yoast_GA_Admin_Settings_Registrar {
 		if ( filter_input( INPUT_GET, 'settings-updated' ) ) {
 			add_action( 'admin_init', array( $this, 'update_ga_tracking_from_profile' ) );
 		}
+
+		$this->validator = new Yoast_GA_Admin_Settings_Validator();
 	}
 
 	/**
@@ -282,6 +283,8 @@ class Yoast_GA_Admin_Settings_Registrar {
 		);
 
 		$this->register_sections( array( 'ua_code', 'general', 'universal', 'advanced', 'debug' ) );
+
+		$this->validator->set_fields( $this->registered_fields );
 	}
 
 	/**
@@ -294,8 +297,13 @@ class Yoast_GA_Admin_Settings_Registrar {
 			return;
 		}
 
-		foreach ( $section_keys as $section_name ) {
-			$this->add_section( $section_name );
+		foreach ( $section_keys as $number => $section_name ) {
+			$add_validation = false;
+			if ( $number === ( count( $section_keys ) - 1 ) ) {
+				$add_validation = true;
+			}
+
+			$this->add_section( $section_name, $add_validation );
 		}
 	}
 
@@ -303,9 +311,15 @@ class Yoast_GA_Admin_Settings_Registrar {
 	 * Register a section
 	 *
 	 * @param string $section_name
+	 * @param bool $hook_validation
 	 */
-	private function add_section( $section_name ) {
-		register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
+	private function add_section( $section_name, $hook_validation ) {
+		if( $hook_validation ) {
+			register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga', array( $this->validator, 'activate_validator' ) );
+		}
+		else {
+			register_setting( $this->settings_api_page . '_' . $section_name, 'yst_ga' );
+		}
 
 		$this->create_section( $section_name );
 
@@ -319,58 +333,6 @@ class Yoast_GA_Admin_Settings_Registrar {
 		}
 
 		$this->close_section( $section_name );
-	}
-
-	/**
-	 * Validate the UA code options
-	 *
-	 * @param array $new_settings
-	 *
-	 * @return array
-	 */
-	public function validate_options_ua_code( $new_settings ) {
-		foreach ( $new_settings['ga_general'] as $key => $value ) {
-			switch ( $key ) {
-				case 'manual_ua_code':
-					if ( $new_settings['ga_general']['manual_ua_code'] === '1' ) {
-						$new_settings['ga_general']['manual_ua_code_field'] = trim( $new_settings['ga_general']['manual_ua_code_field'] );
-						$new_settings['ga_general']['manual_ua_code_field'] = str_replace( '–', '-', $new_settings['ga_general']['manual_ua_code_field'] );
-
-						if ( ! $this->validate_manual_ua_code( $new_settings['ga_general']['manual_ua_code_field'] ) ) {
-							unset( $new_settings['ga_general']['manual_ua_code_field'] );
-
-							$this->errors ++;
-						}
-					}
-					break;
-				case 'analytics_profile':
-					if ( ! empty( $new_settings['ga_general']['analytics_profile'] ) ) {
-						$new_settings['ga_general']['analytics_profile'] = trim( $new_settings['ga_general']['analytics_profile'] );
-
-						if ( ! $this->validate_profile_id( $new_settings['ga_general']['analytics_profile'] ) ) {
-							unset( $new_settings['ga_general']['analytics_profile'] );
-
-							$this->errors ++;
-						}
-					}
-					break;
-			}
-		}
-
-		if ( ! isset( $new_settings['ga_general']['ignore_users'] ) ) {
-			$new_settings['ga_general']['ignore_users'] = array();
-		}
-
-		if ( $this->errors === 0 && get_settings_errors( 'yst_ga_settings' ) === array() ) {
-			add_settings_error(
-				'yst_ga_settings',
-				'yst_ga_settings',
-				__( 'The Google Analytics settings are saved successfully.', 'google-analytics-for-wordpress' ),
-				'updated'
-			);
-		}
-
-		return $new_settings;
 	}
 
 	/**
@@ -520,50 +482,6 @@ class Yoast_GA_Admin_Settings_Registrar {
 			$this->settings_api_page . '_' . $this->current_section,
 			$args
 		);
-	}
-
-	/**
-	 * Validate the manual UA code
-	 *
-	 * @param string $ua_code The UA code that we have to check
-	 *
-	 * @return bool
-	 */
-	private function validate_manual_ua_code( $ua_code ) {
-		if ( ! preg_match( '|^UA-\d{4,}-\d+$|', $ua_code ) ) {
-			add_settings_error(
-				'yst_ga_settings',
-				'yst_ga_settings',
-				__( 'The UA code needs to follow UA-XXXXXXXX-X format.', 'google-analytics-for-wordpress' ),
-				'error'
-			);
-
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Validate the profile ID in the selectbox
-	 *
-	 * @param int $profile_id Check the profile id
-	 *
-	 * @return bool
-	 */
-	private function validate_profile_id( $profile_id ) {
-		if ( ! is_numeric( $profile_id ) ) {
-			add_settings_error(
-				'yst_ga_settings',
-				'yst_ga_settings',
-				__( 'The profile ID needs to be numeric.', 'google-analytics-for-wordpress' ),
-				'error'
-			);
-
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
